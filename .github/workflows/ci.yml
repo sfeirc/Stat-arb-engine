@@ -40,7 +40,9 @@ jobs:
         run: |
           pytest tests/ -v --tb=short --cov=python --cov-report=xml \
             || echo "No tests yet — smoke-test the walk_forward module"
-          python -m python.backtest.walk_forward
+
+      - name: Walk-forward smoke test (synthetic data)
+        run: python -m python.backtest.walk_forward
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -51,7 +53,7 @@ jobs:
 
   cpp-build:
     name: C++ Build & Benchmark
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -67,17 +69,16 @@ jobs:
         run: |
           cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_COMPILER=clang++-16 \
-            -Dbenchmark_DIR=/usr/lib/cmake/benchmark
+            -DCMAKE_CXX_COMPILER=clang++-16
 
       - name: Build
         run: cmake --build build --parallel $(nproc)
 
-      - name: Run benchmarks (smoke test — 100 iterations)
+      - name: Run benchmarks (smoke test)
         run: |
           ./build/bm_arb \
             --benchmark_filter="BM_SignalToOrder|BM_SpscRingPushPop" \
-            --benchmark_min_iterations=100 \
+            --benchmark_min_time=0.01s \
             --benchmark_out=benchmark_results.json \
             --benchmark_out_format=json
 
@@ -89,7 +90,7 @@ jobs:
 
   cpp-asan:
     name: C++ ASan + UBSan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -116,7 +117,7 @@ jobs:
           ASAN_OPTIONS=detect_leaks=1 \
           ./build_asan/bm_arb \
             --benchmark_filter="BM_RiskCheckOnly" \
-            --benchmark_min_iterations=10
+            --benchmark_min_time=0.01s
 
   python-dashboard-smoke:
     name: Streamlit Dashboard Import
@@ -135,17 +136,14 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Import smoke test (no Streamlit server needed)
+      - name: Import smoke test
         run: |
           python -c "
-          import importlib, sys
-          # Patch streamlit so the module-level set_page_config doesn't fail
           import unittest.mock as mock
           import streamlit as st
           with mock.patch.object(st, 'set_page_config', lambda **kw: None):
               pass
           print('Dashboard import OK')
-          python -m python.backtest.walk_forward
           "
         continue-on-error: true
 
