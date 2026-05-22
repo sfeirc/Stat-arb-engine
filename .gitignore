@@ -1,0 +1,11 @@
+build/
+cpp/build/
+*.o
+*.a
+*.so
+ruvector.db
+__pycache__/
+*.pyc
+.DS_Store
+data/raw/
+*.parquet

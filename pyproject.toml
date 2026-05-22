@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "stat-arb-engine"
+version = "0.1.0"
+description = "Statistical arbitrage / pairs trading engine with C++ execution simulation"
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["quantitative-finance", "pairs-trading", "statistical-arbitrage", "cointegration"]
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "pyarrow>=12.0.0",
+    "requests>=2.28.0",
+    "websocket-client>=1.6.0",
+    "streamlit>=1.24.0",
+    "matplotlib>=3.7.0",
+    "plotly>=5.14.0",
+    "reportlab>=4.0.0",
+    "statsmodels>=0.14.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "mypy>=1.4.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+]
+
+[project.scripts]
+stat-arb-backtest = "python.backtest.walk_forward:__main__"
+stat-arb-pipeline = "python.data.pipeline:run_pipeline"
+stat-arb-dashboard = "streamlit:run python/viz/dashboard.py"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["python*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
