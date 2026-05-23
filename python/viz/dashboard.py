@@ -10,16 +10,17 @@ Streamlit dashboard for the statistical arbitrage engine.
 """
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-import streamlit as st
+# Optional: silence Streamlit deprecation warnings during import
+import warnings
 from pathlib import Path
 from typing import Dict, List, Optional
 
-# Optional: silence Streamlit deprecation warnings during import
-import warnings
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # ---------------------------------------------------------------------------
@@ -94,9 +95,7 @@ def run_walk_forward(
     kelly_cap: float,
     target_vol: float,
 ) -> list:
-    from python.backtest.walk_forward import (
-        WalkForwardBacktester, _generate_synthetic_prices
-    )
+    from python.backtest.walk_forward import WalkForwardBacktester, _generate_synthetic_prices
 
     symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]
     pairs = [
@@ -208,7 +207,7 @@ with tab1:
 
     if fold_results:
         all_rets = np.concatenate([f.daily_returns for f in fold_results])
-        from python.backtest.metrics import compute_metrics, profit_factor, max_drawdown_duration
+        from python.backtest.metrics import compute_metrics
         all_trades = [t for f in fold_results for t in f.trades]
         m = compute_metrics(all_rets, all_trades)
 
@@ -256,9 +255,7 @@ with tab2:
     st.header("Cointegration Status")
 
     if price_data and len(price_data) >= 2:
-        from python.cointegration.rolling_coint import (
-            RollingCointegrationEngine, PairStatus
-        )
+        from python.cointegration.rolling_coint import RollingCointegrationEngine
 
         syms = list(price_data.keys())[:4]
         pairs_to_test = [
@@ -320,8 +317,6 @@ with tab3:
         for sy, sx in pairs_sig:
             log_y = np.log(price_data[sy].values[-200:])
             log_x = np.log(price_data[sx].values[-200:])
-            kf = KalmanHedgeRatio() if False else None  # import at top
-
             from python.kalman.hedge_ratio import KalmanHedgeRatio as KF
             kf = KF()
             spreads_live = []
@@ -427,7 +422,10 @@ with tab5:
     st.header("Walk-Forward Analysis")
 
     if fold_results:
-        from python.backtest.statistical_tests import walk_forward_t_test, bootstrap_confidence_interval
+        from python.backtest.statistical_tests import (
+            bootstrap_confidence_interval,
+            walk_forward_t_test,
+        )
 
         # Fold table
         fold_rows = []
@@ -475,8 +473,9 @@ with tab5:
         fig_sh.add_vline(x=0, line_dash="solid", line_color="red")
         st.plotly_chart(fig_sh, use_container_width=True)
 
+        from scipy.stats import kurtosis, skew
+
         from python.backtest.metrics import deflated_sharpe_ratio
-        from scipy.stats import skew, kurtosis
         all_rets = np.concatenate([f.daily_returns for f in fold_results])
         dsr = deflated_sharpe_ratio(
             sharpe_obs=np.mean(sharpes),

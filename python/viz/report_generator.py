@@ -11,18 +11,18 @@ Generates a multi-page PDF containing:
 """
 from __future__ import annotations
 
-import io
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.backends.backend_pdf import PdfPages
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 
 # ---------------------------------------------------------------------------
 # Report generator
@@ -74,9 +74,9 @@ class ReportGenerator:
         """
         from python.backtest.metrics import compute_metrics
         from python.backtest.statistical_tests import (
-            walk_forward_t_test,
             bootstrap_confidence_interval,
             ljung_box_test,
+            walk_forward_t_test,
         )
 
         all_rets = np.concatenate([f.daily_returns for f in fold_results])
@@ -252,7 +252,8 @@ class ReportGenerator:
         lb_stat: float,
         lb_p: float,
     ) -> None:
-        from scipy.stats import skew, kurtosis
+        from scipy.stats import kurtosis, skew
+
         from python.backtest.metrics import deflated_sharpe_ratio
 
         fig, axes = plt.subplots(2, 2, figsize=(11, 8.5))
@@ -384,8 +385,8 @@ class ReportGenerator:
         pivot = df.pivot_table(values="ret", index="year", columns="month", aggfunc="first")
         pivot = pivot.fillna(0)
 
-        im = ax.imshow(pivot.values * 100, aspect="auto", cmap="RdYlGn",
-                       vmin=-10, vmax=10)
+        ax.imshow(pivot.values * 100, aspect="auto", cmap="RdYlGn",
+                  vmin=-10, vmax=10)
         ax.set_xticks(range(len(pivot.columns)))
         ax.set_xticklabels(
             ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -417,9 +418,7 @@ class ReportGenerator:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    from python.backtest.walk_forward import (
-        WalkForwardBacktester, _generate_synthetic_prices
-    )
+    from python.backtest.walk_forward import WalkForwardBacktester, _generate_synthetic_prices
 
     print("Generating synthetic data and running backtest...")
     symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]

@@ -11,9 +11,10 @@ Includes:
 """
 from __future__ import annotations
 
+from typing import List
+
 import numpy as np
 from scipy import stats
-from typing import List
 
 
 def compute_metrics(daily_returns: np.ndarray, trades: list) -> dict:
@@ -232,7 +233,7 @@ def _circular_block_bootstrap(
     starts = rng.integers(0, t, size=n)
     result = []
     for start in starts:
-        end = min(start + block_size, start + n - len(result))
+        _end = min(start + block_size, start + n - len(result))
         block = [data[(start + i) % t] for i in range(min(block_size, n - len(result)))]
         result.extend(block)
         if len(result) >= n:

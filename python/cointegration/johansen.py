@@ -6,9 +6,10 @@ Critical values are embedded from Osterwald-Lenum (1992) / MacKinnon-Haug-Michel
 """
 from __future__ import annotations
 
-import numpy as np
 from dataclasses import dataclass
 from typing import List
+
+import numpy as np
 
 
 @dataclass
@@ -129,7 +130,7 @@ def _reduced_rank_regression(
     eigenvectors = eigenvectors[:, order]
 
     # Normalise: beta' S11 beta = I
-    S11_half = np.linalg.cholesky(S11 + 1e-10 * np.eye(n))
+    _S11_half = np.linalg.cholesky(S11 + 1e-10 * np.eye(n))
     for j in range(n):
         v = eigenvectors[:, j]
         scale = v @ S11 @ v
@@ -253,7 +254,7 @@ def johansen_test(
             beta[:, j] /= beta[0, j]
 
     # Adjustment speeds: alpha = S01 * beta / (beta' S11 beta)
-    S00_inv_half = np.linalg.inv(S11 + 1e-10 * np.eye(n))
+    _S00_inv_half = np.linalg.inv(S11 + 1e-10 * np.eye(n))
     S01 = dX_t.T @ X_lag1_t / T_eff
     alpha = S01 @ beta
 

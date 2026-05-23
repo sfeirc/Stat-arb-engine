@@ -12,17 +12,17 @@ Architecture
 """
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
+import numpy as np
+import pandas as pd
+
+from python.backtest.metrics import compute_metrics
 from python.cointegration.engle_granger import engle_granger_test
 from python.kalman.hedge_ratio import KalmanHedgeRatio
 from python.regime.hmm_regime import HMMRegimeDetector
-from python.backtest.metrics import compute_metrics
 from python.strategy.cost_model import CostModel
-from python.strategy.signal_generator import ZScoreSignalGenerator, SignalParams
 from python.strategy.position_sizer import PositionSizer, SizingParams
 
 
@@ -228,8 +228,6 @@ class WalkForwardBacktester:
     ) -> list:
         """Refit EG, Kalman, HMM for all pairs on training data."""
         active_pairs = []
-        cost_model = CostModel()
-
         for sym_y, sym_x in pairs:
             if sym_y not in df.columns or sym_x not in df.columns:
                 continue
@@ -366,9 +364,6 @@ class WalkForwardBacktester:
             sig = float(np.std(recent)) + 1e-8
             z = (spread - mu) / sig
             z_scores_test.append(z)
-            # alias: use spreads for HMM feature building
-            spreads = spread_buf
-
             # Regime probability
             n_test_z = len(z_scores_test)  # number of test-period z-scores so far
 
@@ -499,7 +494,6 @@ def _generate_synthetic_prices(
 
 
 if __name__ == "__main__":
-    import json
 
     symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]
     pairs = [
