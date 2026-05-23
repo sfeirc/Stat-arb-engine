@@ -3,8 +3,9 @@ Engle-Granger 2-step cointegration test with MacKinnon (2010) p-values.
 """
 from __future__ import annotations
 
-import numpy as np
 from dataclasses import dataclass
+
+import numpy as np
 
 
 @dataclass

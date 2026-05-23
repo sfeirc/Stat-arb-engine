@@ -1,14 +1,14 @@
 """
 Data pipeline: download, validate, normalize, store as Parquet.
 """
-import pandas as pd
+import time
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-from pathlib import Path
 import requests
-import time
-from datetime import datetime, timezone
 
 DATA_DIR = Path("data/parquet")
 DATA_DIR.mkdir(parents=True, exist_ok=True)

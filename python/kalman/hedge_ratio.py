@@ -7,9 +7,10 @@ State-space model:
 """
 from __future__ import annotations
 
-import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional
+
+import numpy as np
 
 
 @dataclass

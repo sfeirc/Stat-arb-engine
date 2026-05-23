@@ -11,16 +11,16 @@ Includes:
 """
 from __future__ import annotations
 
-import numpy as np
-from scipy import stats
 from typing import List
 
+import numpy as np
+from scipy import stats
+
 from python.backtest.metrics import (
-    ttest_significance,
     deflated_sharpe_ratio,
+    ttest_significance,
     whites_reality_check,
 )
-
 
 __all__ = [
     "ttest_significance",

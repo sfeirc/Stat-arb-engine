@@ -15,8 +15,8 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 
-from python.cointegration.engle_granger import engle_granger_test, EGResult
-from python.cointegration.johansen import johansen_test, JohansenResult
+from python.cointegration.engle_granger import EGResult, engle_granger_test
+from python.cointegration.johansen import JohansenResult, johansen_test
 
 
 class PairStatus(str, Enum):
